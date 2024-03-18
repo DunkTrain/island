@@ -16,6 +16,8 @@ This project is a Java simulation of life on an island, where various species of
 
 To run the simulation, simply execute the Main class. Follow the on-screen instructions to start the simulation and observe the island life unfold.
 
+---
+
 # Симуляция Жизни на Острове RU
 
 Этот проект представляет собой симуляцию жизни на острове на языке Java, где различные виды животных и растений сосуществуют в экосистеме. Симуляция позволяет наблюдать взаимодействия между различными видами животных и растений, а также их влияние на популяции друг друга со временем.
