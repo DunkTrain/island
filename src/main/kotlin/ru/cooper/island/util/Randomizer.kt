@@ -12,7 +12,6 @@ class Randomizer private constructor() {
         throw IllegalStateException("Utility class")
     }
 
-
     companion object {
         fun getRandom(from: Int, to: Int): Int {
             return ThreadLocalRandom.current().nextInt(from, to + 1)
