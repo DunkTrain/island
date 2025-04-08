@@ -12,11 +12,6 @@ import ru.cooper.island.core.model.traits.Predators
  * выполнять симуляцию в отдельном потоке.
  */
 class AnimalSimulationTask(private val animal: Animal, private val islandCell: IslandCell) : Runnable {
-    /**
-     * Метод run() представляет собой точку входа для выполнения симуляции жизни животного.
-     * Внутри метода происходит выполнение действий животного, таких как питание, размножение,
-     * потеря веса и перемещение на другую локацию.
-     */
     override fun run() {
         animal.lock.lock()
         try {
