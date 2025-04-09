@@ -9,35 +9,53 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import java.net.URL?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.cooper.island.ui.MainController">
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ru.cooper.island.ui.MainController">
+
+    <stylesheets>
+        <URL value="@css/styles.css"/>
+    </stylesheets>
+
     <top>
-        <VBox alignment="CENTER" spacing="10">
-            <Label styleClass="title-label" text="Island Simulation" />
-            <Label fx:id="statusLabel" text="Simulation not started" />
+        <VBox alignment="CENTER" spacing="10" styleClass="header-box">
+            <Label styleClass="title-label" text="Island Simulation">
+                <font>
+                    <Font name="System Bold" size="24"/>
+                </font>
+            </Label>
+            <Label fx:id="statusLabel" text="Simulation not started" styleClass="status-label"/>
             <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
+                <Insets bottom="15" left="20" right="20" top="15"/>
             </padding>
         </VBox>
     </top>
+
     <center>
-        <ScrollPane fitToHeight="true" fitToWidth="true">
-            <GridPane fx:id="islandGridPane" alignment="CENTER" hgap="1" vgap="1" />
+        <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="grid-scroll-pane">
+            <GridPane fx:id="islandGridPane" alignment="CENTER" hgap="1" vgap="1" styleClass="simulation-grid"/>
         </ScrollPane>
     </center>
+
     <bottom>
-        <VBox spacing="10">
-            <HBox alignment="CENTER" spacing="10">
-                <Button fx:id="startButton" onAction="#handleStartSimulation" text="Start" />
-                <Button fx:id="stopButton" disable="true" onAction="#handleStopSimulation" text="Stop" />
-                <Button fx:id="resetButton" onAction="#handleResetSimulation" text="Reset" />
+        <VBox spacing="15" styleClass="control-panel">
+            <HBox alignment="CENTER" spacing="15" styleClass="button-group">
+                <Button fx:id="startButton" onAction="#handleStartSimulation" text="Start" styleClass="action-button start-button"/>
+                <Button fx:id="stopButton" disable="true" onAction="#handleStopSimulation" text="Stop" styleClass="action-button stop-button"/>
+                <Button fx:id="resetButton" onAction="#handleResetSimulation" text="Reset" styleClass="action-button reset-button"/>
             </HBox>
-            <HBox alignment="CENTER" spacing="10">
-                <Label text="Simulation Speed:" />
-                <Slider fx:id="speedSlider" blockIncrement="100" majorTickUnit="200" max="1000" min="100" showTickLabels="true" showTickMarks="true" value="500" />
+
+            <HBox alignment="CENTER" spacing="15" styleClass="slider-group">
+                <Label text="Simulation Speed:" styleClass="slider-label"/>
+                <Slider fx:id="speedSlider" blockIncrement="100" majorTickUnit="200"
+                        max="1000" min="100" showTickLabels="true" showTickMarks="true"
+                        value="500" styleClass="speed-slider"/>
             </HBox>
+
             <padding>
-                <Insets bottom="10" left="10" right="10" top="10" />
+                <Insets bottom="20" left="20" right="20" top="10"/>
             </padding>
         </VBox>
     </bottom>

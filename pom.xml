@@ -10,14 +10,15 @@
     <version>1.2.0</version>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.1.10</kotlin.version>
         <javafx.version>21</javafx.version>
+        <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
+        <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
     </properties>
 
-    <!-- Repository -->
     <repositories>
         <repository>
             <id>central</id>
@@ -26,7 +27,7 @@
     </repositories>
 
     <dependencies>
-        <!-- Kotlin Standard Library -->
+        <!-- Kotlin -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
@@ -34,6 +35,11 @@
         </dependency>
 
         <!-- JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -49,13 +55,8 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
 
-        <!--For the tests-->
+        <!-- Tests -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit</artifactId>
@@ -66,60 +67,58 @@
 
     <build>
         <plugins>
-            <!-- Kotlin Maven Plugin -->
+            <!-- Kotlin Plugin -->
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
                 <version>${kotlin.version}</version>
-                <configuration>
-                    <jvmTarget>17</jvmTarget>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>compile</id>
+                        <id>kotlin-compile-first</id>
                         <phase>process-sources</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
-                    </execution>
-                    <execution>
-                        <id>test-compile</id>
-                        <phase>process-test-sources</phase>
-                        <goals>
-                            <goal>test-compile</goal>
-                        </goals>
+                        <configuration>
+                            <jvmTarget>17</jvmTarget>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- Maven Compiler Plugin (for Java) -->
+            <!-- Java Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>17</source>
-                    <target>17</target>
-                </configuration>
+                <version>${maven.compiler.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>java-compile-second</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
+            <!-- JavaFX Plugin -->
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
+                <version>${javafx.maven.plugin.version}</version>
                 <configuration>
-                    <mainClass>ru.cooper.island.Main</mainClass>
+                    <mainClass>ru.cooper.island.IslandApp</mainClass>
                     <jlinkZipName>island-release</jlinkZipName>
+                    <options>
+                        <option>--add-exports</option>
+                        <option>javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</option>
+                    </options>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>jlink</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jlink</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
