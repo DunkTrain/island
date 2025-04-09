@@ -152,4 +152,12 @@ class IslandCell(
             unlock()
         }
     }
+
+    val animalsForJava: ConcurrentMap<Class<out Animal>, MutableSet<Animal>>
+        @JvmName("getAnimals")
+        get() = animals
+
+    val plantForJava: Double
+        @JvmName("getPlant")
+        get() = plant
 }
