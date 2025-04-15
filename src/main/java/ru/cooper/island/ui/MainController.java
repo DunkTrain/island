@@ -23,10 +23,16 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Контроллер главного представления симуляции острова.
+ * Главный контроллер JavaFX-приложения "Остров животных".
  * <p>
- * Отвечает за запуск, остановку и сброс симуляции, а также за обновление визуального состояния сетки.
- * </p>
+ * Отвечает за:
+ * <ul>
+ *     <li>Запуск симуляции</li>
+ *     <li>Останов симуляции</li>
+ *     <li>Сброс (полное обновление) симуляции</li>
+ *     <li>Обновление UI (отображение животных и растений в сетке)</li>
+ * </ul>
+ * Все действия с UI происходят внутри JavaFX Application Thread.
  */
 public class MainController {
 
@@ -48,28 +54,41 @@ public class MainController {
     @FXML
     private Slider speedSlider;
 
-    private WorldInitializer worldInitializer;
     private WorldLifeCycle worldLifeCycle;
-    private final Map<String, Color> animalColors = new HashMap<>();
-    private final AtomicBoolean simulationRunning = new AtomicBoolean(false);
-    private final int CELL_SIZE = 50;
 
-    // Стандартные значения для сетки, если не определены в конфиге
-    private final int DEFAULT_GRID_HEIGHT = 10;
-    private final int DEFAULT_GRID_WIDTH = 10;
+    /**
+     * Map, связывающая имя животного (String) с цветом (Color),
+     * чтобы клетка с доминирующим животным красилась соответствующим образом.
+     */
+    private final Map<String, Color> animalColors = new HashMap<>();
+
+    /**
+     * Флаг, указывающий, запущена ли симуляция.
+     */
+    private final AtomicBoolean simulationRunning = new AtomicBoolean(false);
+
+    /**
+     * Размер одной клетки в пикселях.
+     */
+    private static final int CELL_SIZE = 50;
 
     /**
      * Инициализация контроллера.
      * <p>
-     * Вызывается автоматически после загрузки FXML. На этом этапе производится инициализация цветов животных,
-     * установка слушателя для изменения скорости симуляции и сброс состояния симуляции.
-     * </p>
+     * Вызывается автоматически после загрузки FXML.
+     * В этом методе:
+     * <ul>
+     *     <li>Инициализируется карта цветов животных</li>
+     *     <li>Вызывается {@link #resetSimulation()} для установки начального состояния</li>
+     *     <li>Устанавливается слушатель для слайдера скорости</li>
+     * </ul>
      */
     @FXML
     public void initialize() {
         initializeAnimalColors();
         resetSimulation();
 
+        // Слушатель изменения скорости, чтобы в реальном времени обновлять шаг симуляции
         speedSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (worldLifeCycle != null) {
                 worldLifeCycle.setStepDuration(newVal.intValue());
@@ -78,7 +97,7 @@ public class MainController {
     }
 
     /**
-     * Инициализирует мапу цветов для различных типов животных.
+     * Заполняет {@link #animalColors} цветами для различных животных.
      */
     private void initializeAnimalColors() {
         animalColors.put("Wolf", Color.DARKGRAY);
@@ -99,11 +118,10 @@ public class MainController {
     }
 
     /**
-     * Запускает симуляцию.
+     * Обработчик кнопки "Start".
      * <p>
-     * При запуске отключает кнопку старта и включает кнопку остановки, а также передаёт длительность шага симуляции.
-     * Симуляция запускается в отдельном потоке.
-     * </p>
+     * Запускает симуляцию, если она ещё не запущена. Блокирует кнопку Start,
+     * разблокирует кнопку Stop и отключает кнопку Reset.
      */
     @FXML
     public void handleStartSimulation() {
@@ -116,6 +134,7 @@ public class MainController {
             int stepDuration = (int) speedSlider.getValue();
             worldLifeCycle.setStepDuration(stepDuration);
 
+            // Запускаем симуляцию в отдельном потоке
             new Thread(() -> {
                 worldLifeCycle.setUIUpdateCallback(this::updateUI);
                 worldLifeCycle.start();
@@ -126,29 +145,29 @@ public class MainController {
     }
 
     /**
-     * Останавливает симуляцию.
+     * Обработчик кнопки "Stop".
      * <p>
-     * При остановке включает кнопку старта, отключает кнопку остановки и включает кнопку сброса.
-     * Также обновляет состояние UI.
-     * </p>
+     * Останавливает симуляцию, если она была запущена.
+     * Разблокирует кнопку Start, блокирует Stop и разблокирует Reset.
      */
     @FXML
     public void handleStopSimulation() {
         if (simulationRunning.get()) {
             worldLifeCycle.stop();
             simulationRunning.set(false);
+
             startButton.setDisable(false);
             stopButton.setDisable(true);
             resetButton.setDisable(false);
+
             statusLabel.setText("Simulation stopped");
         }
     }
 
     /**
-     * Сбрасывает состояние симуляции.
+     * Обработчик кнопки "Reset".
      * <p>
-     * Выполняется сброс текущего состояния, а также инициализируется сетка для отображения симуляции.
-     * </p>
+     * Полностью пересоздаёт мир и обновляет интерфейс. Останавливает текущую симуляцию.
      */
     @FXML
     public void handleResetSimulation() {
@@ -157,11 +176,12 @@ public class MainController {
     }
 
     /**
-     * Выполняет полный сброс симуляции, включая пересоздание мира и перерисовку UI.
-     * <p>
-     * Пытается получить размеры сетки из конфигурации, используя рефлексию, либо использует значения по умолчанию.
-     * Затем инициализируется мир и жизненный цикл симуляции.
-     * </p>
+     * Полный сброс симуляции:
+     * <ul>
+     *     <li>Сбрасывает флаг {@link #simulationRunning}</li>
+     *     <li>Создаёт {@link WorldInitializer} и {@link WorldLifeCycle}</li>
+     *     <li>Вызывает {@link #initializeGridUI(IslandGrid)} для перерисовки интерфейса</li>
+     * </ul>
      */
     private void resetSimulation() {
         simulationRunning.set(false);
@@ -169,30 +189,22 @@ public class MainController {
         stopButton.setDisable(true);
         resetButton.setDisable(false);
 
-        int gridHeight = DEFAULT_GRID_HEIGHT;
-        int gridWidth = DEFAULT_GRID_WIDTH;
+        // Берём напрямую
+        int gridHeight = SimulationConfig.FIELD_TO_SIZE_Y;
+        int gridWidth  = SimulationConfig.FIELD_TO_SIZE_X;
 
-        try {
-            java.lang.reflect.Field gridHeightField = SimulationConfig.class.getDeclaredField("GRID_HEIGHT");
-            java.lang.reflect.Field gridWidthField = SimulationConfig.class.getDeclaredField("GRID_WIDTH");
-            gridHeightField.setAccessible(true);
-            gridWidthField.setAccessible(true);
-            gridHeight = (int) gridHeightField.get(null);
-            gridWidth = (int) gridWidthField.get(null);
-        } catch (Exception ignored) {
-            // Используем значения по умолчанию
-        }
+        // Инициализируем мир и жизненный цикл
+        WorldInitializer worldInitializer = new WorldInitializer(gridHeight, gridWidth);
+        worldLifeCycle   = new WorldLifeCycle(worldInitializer);
 
-        worldInitializer = new WorldInitializer(gridHeight, gridWidth);
-        worldLifeCycle = new WorldLifeCycle(worldInitializer);
-
-        initializeGridUI(worldInitializer.islandGrid);
+        // Перерисовываем UI
+        initializeGridUI(worldInitializer.getIslandGrid());
     }
 
     /**
-     * Инициализирует графическое представление сетки острова.
+     * Создаёт видимую сетку в UI (GridPane) на основе данных {@link IslandGrid}.
      *
-     * @param islandGrid Объект, содержащий данные о клетках острова.
+     * @param islandGrid объект с данными о клетках.
      */
     private void initializeGridUI(IslandGrid islandGrid) {
         if (islandGridPane != null) {
@@ -213,10 +225,10 @@ public class MainController {
     }
 
     /**
-     * Создает панель для отображения отдельной клетки.
+     * Создаёт {@link StackPane} для отображения одной клетки (фон + текст).
      *
-     * @param cell Объект клетки.
-     * @return StackPane, представляющий клетку.
+     * @param cell клетка острова
+     * @return {@link StackPane}, отображающий клетку.
      */
     private StackPane createCellPane(IslandCell cell) {
         StackPane stackPane = new StackPane();
@@ -235,10 +247,10 @@ public class MainController {
     }
 
     /**
-     * Обновляет текстовую информацию в клетке.
+     * Обновляет текст в переданном {@code cellInfo} на основе содержимого {@code cell}.
      *
-     * @param cellInfo Текстовый элемент для отображения информации.
-     * @param cell     Объект клетки.
+     * @param cellInfo элемент {@link Text} для отображения информации
+     * @param cell     клетка острова, из которой берутся данные
      */
     private void updateCellInfo(Text cellInfo, IslandCell cell) {
         String dominantType = getDominantAnimalType(cell);
@@ -246,10 +258,10 @@ public class MainController {
     }
 
     /**
-     * Определяет доминирующий тип живых организмов в клетке.
+     * Определяет «доминирующее» животное (или растение) в клетке для краткого отображения.
      *
-     * @param cell Объект клетки.
-     * @return Строка с названием доминирующего типа и количеством, либо информацией о растениях.
+     * @param cell клетка
+     * @return строка вида "Wolf (3)" или "🌿 15.0", либо пустая строка
      */
     private String getDominantAnimalType(IslandCell cell) {
         String dominantType = "";
@@ -259,7 +271,7 @@ public class MainController {
             int count = entry.getValue().size();
             if (count > maxCount) {
                 maxCount = count;
-                dominantType = entry.getKey().getSimpleName();
+                dominantType = entry.getKey().getSimpleName(); // Название класса животного
             }
         }
 
@@ -273,12 +285,11 @@ public class MainController {
     }
 
     /**
-     * Обновляет пользовательский интерфейс на основе текущего состояния мира.
+     * Callback, вызываемый из фонового потока симуляции для обновления UI.
      * <p>
-     * Метод вызывается из другого потока через UI callback, поэтому используется {@code Platform.runLater}.
-     * </p>
+     * Использует {@code Platform.runLater}, чтобы изменения шли в JavaFX Application Thread.
      *
-     * @param islandGrid Объект, содержащий обновлённую информацию о клетках.
+     * @param islandGrid текущее состояние всех клеток.
      */
     public void updateUI(IslandGrid islandGrid) {
         Platform.runLater(() -> {
@@ -295,11 +306,11 @@ public class MainController {
     }
 
     /**
-     * Обновляет визуальное состояние отдельной клетки в сетке.
+     * Обновляет UI (цвет и текст) для одной клетки в {@link GridPane}.
      *
-     * @param row  Номер строки клетки.
-     * @param col  Номер столбца клетки.
-     * @param cell Объект клетки с обновлённой информацией.
+     * @param row  индекс строки
+     * @param col  индекс столбца
+     * @param cell данные клетки
      */
     private void updateCell(int row, int col, IslandCell cell) {
         if (islandGridPane != null) {
@@ -317,22 +328,24 @@ public class MainController {
                 Rectangle background = (Rectangle) cellPane.getChildren().get(0);
                 Text cellInfo = (Text) cellPane.getChildren().get(1);
 
+                // Обновляем текст
                 updateCellInfo(cellInfo, cell);
 
+                // Определяем цвет клетки
                 String dominantType = getDominantAnimalType(cell).split(" ")[0];
                 if (animalColors.containsKey(dominantType)) {
                     background.setFill(animalColors.get(dominantType));
                 } else if (cell.getPlant() > 0) {
-                    double maxPlantAmount;
+                    double maxPlantAmount = 200.0;
                     try {
                         java.lang.reflect.Field maxPlantField = SimulationConfig.class.getDeclaredField("MAX_AMOUNT_OF_PLANT_ON_ONE_CELL");
                         maxPlantField.setAccessible(true);
                         maxPlantAmount = (double) maxPlantField.get(null);
                     } catch (Exception e) {
-                        maxPlantAmount = 200.0;
+                        System.err.println("Не удалось получить MAX_AMOUNT_OF_PLANT_ON_ONE_CELL: " + e.getMessage());
                     }
                     double intensity = Math.min(1.0, cell.getPlant() / maxPlantAmount);
-                    background.setFill(Color.rgb(34, (int)(139 + 116 * intensity), 34));
+                    background.setFill(Color.rgb(34, (int) (139 + 116 * intensity), 34));
                 } else {
                     background.setFill(Color.FORESTGREEN);
                 }

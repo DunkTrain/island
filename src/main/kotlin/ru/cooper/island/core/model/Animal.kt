@@ -88,8 +88,8 @@ abstract class Animal : Nature(), Cloneable {
      */
     open fun move(islandCell: IslandCell) {
         islandCell.lock.lock()
-        val newLocation = choiceOfAvailableLocation(islandCell)
         try {
+            val newLocation = choiceOfAvailableLocation(islandCell)
             if (newLocation.hasSpaceFor(this.aClass)) {
                 newLocation.addAnimal(this)
                 islandCell.removeAnimal(this)

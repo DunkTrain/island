@@ -7,20 +7,39 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * The main entry point for the Island Simulation application.
+ * Точка входа в JavaFX-приложение "Island Simulation".
  * <p>
- * This class initializes the JavaFX application, loads the UI layout from {@code /main-view.fxml},
- * and displays the primary window. The project combines both Kotlin and Java code.
- * </p>
+ * Отвечает за:
+ * <ul>
+ *     <li>Загрузку главного FXML-файла {@code /main-view.fxml}</li>
+ *     <li>Создание {@link Scene} и показ {@link Stage}</li>
+ *     <li>Управление жизненным циклом JavaFX (методы {@code init()}, {@code stop()}, {@code start(Stage)})</li>
+ * </ul>
+ * Проект использует Kotlin и Java совместно.
  */
 public class IslandApp extends Application {
 
     /**
-     * Starts the JavaFX application by loading the main FXML layout
-     * and setting up the primary stage with the scene.
+     * Точка входа для запуска приложения (вызов {@link Application#launch(String...)}).
      *
-     * @param primaryStage the main application window.
-     * @throws Exception if the FXML resource fails to load or initialization fails.
+     * @param args аргументы командной строки
+     */
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    /**
+     * Метод {@code start} вызывается JavaFX при старте приложения.
+     * <p>
+     * Здесь:
+     * <ul>
+     *     <li>Загружается FXML (главная сцена)</li>
+     *     <li>Создаётся {@link Scene} заданного размера</li>
+     *     <li>Отображается {@link Stage}</li>
+     * </ul>
+     *
+     * @param primaryStage основной контейнер UI
+     * @throws Exception если произошла ошибка при загрузке ресурса FXML
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -33,23 +52,14 @@ public class IslandApp extends Application {
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Не удалось запустить JavaFX-приложение: " + e.getMessage());
             throw e;
         }
     }
 
     /**
-     * The main entry point of the program. Launches the JavaFX application.
-     *
-     * @param args command-line arguments.
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    /**
-     * Called when the application is about to stop.
-     * Ensures a clean shutdown of the process.
+     * Вызывается при закрытии приложения (например, пользователь закрыл окно).
+     * Завершает процесс через {@link System#exit(int)}.
      */
     @Override
     public void stop() {
