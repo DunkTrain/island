@@ -82,6 +82,7 @@ public class WorldLifeCycle {
                 future.get();
             } catch (Exception e) {
                 System.err.println("Error waiting for simulation task: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 

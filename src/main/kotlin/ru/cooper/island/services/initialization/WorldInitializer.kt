@@ -17,6 +17,10 @@ class WorldInitializer(
     private val gridHeight: Int,
     private val gridWidth: Int
 ) {
+
+    /**
+     * Сетка острова, содержащая ссылки на все клетки.
+     */
     @JvmField
     val islandGrid: IslandGrid = IslandGrid(gridHeight, gridWidth)
 
@@ -25,6 +29,9 @@ class WorldInitializer(
         populateGridWithLife()
     }
 
+    /**
+     * Инициализирует ячейки (IslandCell) в сетке острова.
+     */
     private fun initializeCells() {
         for (y in 0 until gridHeight) {
             for (x in 0 until gridWidth) {
@@ -33,6 +40,9 @@ class WorldInitializer(
         }
     }
 
+    /**
+     * Заполняет клетки животными и растениями с заданной вероятностью.
+     */
     private fun populateGridWithLife() {
         for (y in 0 until gridHeight) {
             for (x in 0 until gridWidth) {
@@ -47,6 +57,9 @@ class WorldInitializer(
         }
     }
 
+    /**
+     * Устанавливает связи между клеткой и соседними клетками (8 направлений).
+     */
     private fun connectAdjacentCells(cell: IslandCell) {
         val minY = max(cell.yCoordinate - 1, 0)
         val maxY = min(cell.yCoordinate + 1, gridHeight - 1)
@@ -64,6 +77,9 @@ class WorldInitializer(
         }
     }
 
+    /**
+     * Наполняет клетку животными, количество выбирается случайно, но не превышает установленных параметров.
+     */
     private fun populateCellWithAnimals(cell: IslandCell) {
         SimulationConfig.ANIMAL_CLASSES.forEach { animalClass ->
             val maxCount = SimulationConfig.ANIMAL_PARAMETERS[animalClass]?.get(1)?.toInt() ?: 0
@@ -78,6 +94,9 @@ class WorldInitializer(
         }
     }
 
+    /**
+     * Заполняет клетку растениями (plant) случайным образом в установленных пределах.
+     */
     private fun populateCellWithPlants(cell: IslandCell) {
         cell.plant = Randomizer.getRandom(
             0,
@@ -85,6 +104,9 @@ class WorldInitializer(
         ).toDouble()
     }
 
+    /**
+     * Создает животное через рефлексию.
+     */
     private fun createAnimal(animalClass: Class<out Animal>): Animal? {
         return try {
             animalClass.getDeclaredConstructor().newInstance()
@@ -95,6 +117,9 @@ class WorldInitializer(
     }
 
     companion object {
-        private const val CREATION_PROBABILITY = 70 // 70% chance to create entities in a cell
+        /**
+         * Вероятность (в %) создания живности/растений в каждой клетке.
+         */
+        private const val CREATION_PROBABILITY = 70
     }
 }
