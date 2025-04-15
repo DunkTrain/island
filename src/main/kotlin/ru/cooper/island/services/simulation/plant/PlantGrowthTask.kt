@@ -7,10 +7,9 @@ import ru.cooper.island.core.model.map.IslandCell
  * на острове животных. Класс реализует интерфейс Runnable, позволяя выполнять рост растений
  * в отдельном потоке.
  */
-class PlantGrowthTask(private val islandCell: IslandCell) : Runnable {
-    fun growUp() {
-        islandCell.growPlants()
-    }
+class PlantGrowthTask(
+    private val islandCell: IslandCell
+) : Runnable {
 
     override fun run() {
         islandCell.lock.lock()
@@ -19,5 +18,12 @@ class PlantGrowthTask(private val islandCell: IslandCell) : Runnable {
         } finally {
             islandCell.lock.unlock()
         }
+    }
+
+    /**
+     * Логика роста растений внутри клетки (использует методы IslandCell).
+     */
+    private fun growUp() {
+        islandCell.growPlants()
     }
 }

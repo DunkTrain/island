@@ -15,14 +15,22 @@ class AnimalSimulationTask(private val animal: Animal, private val islandCell: I
     override fun run() {
         animal.lock.lock()
         try {
-            if (animal is Predators) {
-                animal.eat(islandCell)
-            } else if (animal is Herbivorous) {
-                animal.eat(islandCell)
-            } else if (animal is Omnivore) {
-                animal.eat(islandCell)
-            } else {
-                throw IllegalArgumentException("Unknown animal type: " + animal.javaClass.name)
+            when (animal) {
+                is Predators -> {
+                    animal.eat(islandCell)
+                }
+
+                is Herbivorous -> {
+                    animal.eat(islandCell)
+                }
+
+                is Omnivore -> {
+                    animal.eat(islandCell)
+                }
+
+                else -> {
+                    throw IllegalArgumentException("Unknown animal type: " + animal.javaClass.name)
+                }
             }
         } catch (ex: Exception) {
             System.err.println("Error during animal simulation task: " + ex.message)
@@ -30,9 +38,12 @@ class AnimalSimulationTask(private val animal: Animal, private val islandCell: I
         } finally {
             animal.lock.unlock()
         }
+
         animal.reproduction(islandCell)
         animal.weightLoss(islandCell)
         animal.timeToDie(islandCell)
+
+        animal.lock.lock()
         try {
             animal.move(islandCell)
         } catch (ex: Exception) {
