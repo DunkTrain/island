@@ -90,6 +90,9 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
+                            <sourceDirs>
+                                <sourceDir>src/main/kotlin</sourceDir>
+                            </sourceDirs>
                             <jvmTarget>21</jvmTarget>
                         </configuration>
                     </execution>

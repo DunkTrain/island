@@ -2,11 +2,27 @@ package ru.cooper.island.core.model.map
 
 import ru.cooper.island.config.SimulationConfig
 import ru.cooper.island.core.model.Animal
-import ru.cooper.island.core.model.animal.herbivores.*
-import ru.cooper.island.core.model.animal.predators.*
+import ru.cooper.island.core.model.animal.herbivores.Boar
+import ru.cooper.island.core.model.animal.herbivores.Buffalo
+import ru.cooper.island.core.model.animal.herbivores.Caterpillar
+import ru.cooper.island.core.model.animal.herbivores.Deer
+import ru.cooper.island.core.model.animal.herbivores.Duck
+import ru.cooper.island.core.model.animal.herbivores.Goat
+import ru.cooper.island.core.model.animal.herbivores.Horse
+import ru.cooper.island.core.model.animal.herbivores.Mouse
+import ru.cooper.island.core.model.animal.herbivores.Rabbit
+import ru.cooper.island.core.model.animal.herbivores.Sheep
+import ru.cooper.island.core.model.animal.predators.Bear
+import ru.cooper.island.core.model.animal.predators.Eagle
+import ru.cooper.island.core.model.animal.predators.Fox
+import ru.cooper.island.core.model.animal.predators.Snake
+import ru.cooper.island.core.model.animal.predators.Wolf
 import ru.cooper.island.services.simulation.animal.AnimalSimulationTask
 import ru.cooper.island.services.simulation.plant.PlantGrowthTask
-import java.util.concurrent.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.min
@@ -15,7 +31,6 @@ class IslandCell(
     @JvmField val yCoordinate: Int,
     @JvmField val xCoordinate: Int
 ) {
-    private val simulationExecutor = Executors.newFixedThreadPool(4)
 
     private val _neighboringLocations = mutableListOf<IslandCell>()
     val neighboringLocations: List<IslandCell>
@@ -50,15 +65,6 @@ class IslandCell(
             futures.add(executor.submit(PlantGrowthTask(this)))
         }
         return futures
-    }
-
-    @Throws(InterruptedException::class)
-    fun await(milliseconds: Int) {
-        simulationExecutor.awaitTermination(milliseconds.toLong(), TimeUnit.MILLISECONDS)
-    }
-
-    fun shutdown() {
-        simulationExecutor.shutdown()
     }
 
     fun removeAnimal(animal: Animal) {

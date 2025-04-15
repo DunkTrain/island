@@ -21,7 +21,6 @@ class WorldInitializer(
     /**
      * Сетка острова, содержащая ссылки на все клетки.
      */
-    @JvmField
     val islandGrid: IslandGrid = IslandGrid(gridHeight, gridWidth)
 
     init {

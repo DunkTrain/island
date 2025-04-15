@@ -1,54 +1,59 @@
-/* Основные цвета */
+/* Основные стили и переменные */
 .root {
-    -fx-base: #ecf0f1;
-    -fx-background: #f5f5f5;
-    -fx-accent: #3498db;
+    -fx-base: #f9f9f9;
+    -fx-background: linear-gradient(to bottom, #ffffff, #f0f3f6);
+    -fx-accent: #4a90e2;
     -fx-focus-color: -fx-accent;
     -fx-default-button: -fx-accent;
+    -fx-font-family: "Segoe UI Emoji", "Segoe UI", sans-serif;
+    -fx-font-size: 14px;
 }
 
 /* Заголовок */
 .header-box {
-    -fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e);
+    -fx-background-color: linear-gradient(to right, #2c3e50, #4a90e2);
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 5, 0, 0, 2);
+    -fx-padding: 20;
+    -fx-background-radius: 10 10 0 0;
 }
 
 .title-label {
     -fx-text-fill: white;
     -fx-font-weight: bold;
+    -fx-font-size: 20px;
 }
 
 .status-label {
     -fx-text-fill: #bdc3c7;
-    -fx-font-size: 14px;
+    -fx-font-size: 13px;
 }
 
 /* Сетка симуляции */
 .grid-scroll-pane {
     -fx-background: white;
-    -fx-border-color: #bdc3c7;
+    -fx-border-color: #e1e4e8;
+    -fx-border-radius: 8;
     -fx-padding: 10;
 }
 
 .simulation-grid {
-    -fx-background-color: #ecf0f1;
+    -fx-background-color: #f5f7fa;
+    -fx-border-radius: 8;
 }
 
 /* Панель управления */
 .control-panel {
-    -fx-background-color: white;
-    -fx-border-color: #bdc3c7;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e1e4e8;
     -fx-border-width: 1 0 0 0;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 0, -2, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 0, -2, 0, 0);
+    -fx-padding: 15 20 15 20;
+    -fx-spacing: 15;
 }
 
-.button-group {
+.button-group, .slider-group {
     -fx-alignment: center;
-}
-
-.slider-group {
-    -fx-alignment: center;
-    -fx-padding: 0 0 5 0;
+    -fx-spacing: 15;
 }
 
 .slider-label {
@@ -57,44 +62,46 @@
 }
 
 .speed-slider .track {
-    -fx-background-color: #bdc3c7;
+    -fx-background-color: #d0d6dc;
+    -fx-background-radius: 5;
 }
 
 .speed-slider .thumb {
-    -fx-background-color: #3498db;
+    -fx-background-color: #4a90e2;
+    -fx-background-radius: 50%;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 2, 0.5, 0, 0);
 }
 
 /* Кнопки */
 .action-button {
-    -fx-background-radius: 5;
-    -fx-background-insets: 0;
-    -fx-padding: 8 15;
+    -fx-background-radius: 10;
+    -fx-padding: 10 20;
     -fx-font-size: 14px;
+    -fx-font-weight: bold;
     -fx-text-fill: white;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0.2, 0, 2);
+    -fx-transition: all 0.3s ease-in-out;
+    -fx-border-width: 0;
 }
 
 .start-button {
-    -fx-background-color: #2ecc71;
+    -fx-background-color: linear-gradient(to right, #27ae60, #2ecc71);
 }
-
 .start-button:hover {
-    -fx-background-color: #27ae60;
+    -fx-background-color: linear-gradient(to right, #219150, #27ae60);
 }
 
 .stop-button {
-    -fx-background-color: #e74c3c;
+    -fx-background-color: linear-gradient(to right, #e74c3c, #c0392b);
 }
-
 .stop-button:hover {
-    -fx-background-color: #c0392b;
+    -fx-background-color: linear-gradient(to right, #c0392b, #a93226);
 }
 
 .reset-button {
-    -fx-background-color: #f39c12;
+    -fx-background-color: linear-gradient(to right, #f39c12, #f1c40f);
 }
-
 .reset-button:hover {
-    -fx-background-color: #d35400;
+    -fx-background-color: linear-gradient(to right, #d68910, #d4ac0d);
 }
